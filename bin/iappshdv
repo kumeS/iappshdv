@@ -1,0 +1,187 @@
+#!/usr/bin/env bash
+#
+# iappshdv - iOS/macOS Application Development Helper and Verification Tool
+# 
+# Main command dispatcher for iappshdv
+#
+
+set -e
+
+# Script directory resolution
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+IAPPSHDV_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
+LIB_DIR="$IAPPSHDV_ROOT/lib"
+
+# Load common functions
+source "$LIB_DIR/common.sh"
+
+# Version
+VERSION="0.1.0"
+
+# Display usage information
+show_usage() {
+  echo "iappshdv - iOS/macOS Application Development Helper and Verification Tool v$VERSION"
+  echo ""
+  echo "Usage: iappshdv <command> [options]"
+  echo ""
+  echo "Commands:"
+  echo "  setup         Setup development environment"
+  echo "    prereqs     Install prerequisite tools"
+  echo "    env         Prepare Mac environment for iOS development"
+  echo ""
+  echo "  verify        Run verification tools"
+  echo "    code        Verify code quality"
+  echo "    security    Perform security checks"
+  echo "    size        Verify IPA size"
+  echo "    all         Run all verification checks"
+  echo ""
+  echo "  build         Verify build"
+  echo ""
+  echo "  help          Show this help message"
+  echo "  version       Show version information"
+  echo ""
+  echo "For more information, run: iappshdv help <command>"
+  echo ""
+}
+
+# Display version information
+show_version() {
+  echo "iappshdv version $VERSION"
+}
+
+# Show command-specific help
+show_command_help() {
+  local command=$1
+  
+  case "$command" in
+    setup)
+      echo "iappshdv setup - Setup development environment"
+      echo ""
+      echo "Usage: iappshdv setup <subcommand>"
+      echo ""
+      echo "Subcommands:"
+      echo "  prereqs     Install prerequisite tools (Xcode Command Line Tools, Homebrew, etc.)"
+      echo "  env         Prepare Mac environment for iOS development (XcodeGen, swift-format, etc.)"
+      echo ""
+      ;;
+    verify)
+      echo "iappshdv verify - Run verification tools"
+      echo ""
+      echo "Usage: iappshdv verify <subcommand> <project_folder> [options]"
+      echo ""
+      echo "Subcommands:"
+      echo "  code        Verify code quality (format, lint, complexity, etc.)"
+      echo "  security    Perform security checks (vulnerabilities, licenses, etc.)"
+      echo "  size        Verify IPA size"
+      echo "  all         Run all verification checks"
+      echo ""
+      echo "Options:"
+      echo "  <project_folder>   Target project directory"
+      echo "  [<ipa_path>]       IPA file path (optional for size verification)"
+      echo "  [<baseline_mb>]    IPA size baseline in MB (optional)"
+      echo "  [-s|--silent]      Silent mode (suppress detailed output)"
+      echo "  [-y|--yes]         Auto-yes response (automatically approve interactive prompts)"
+      echo "  [-u|--update-deps] Automatically update dependencies"
+      echo ""
+      ;;
+    build)
+      echo "iappshdv build - Verify build"
+      echo ""
+      echo "Usage: iappshdv build <project_folder>"
+      echo ""
+      echo "Options:"
+      echo "  <project_folder>   Target project directory"
+      echo ""
+      ;;
+    *)
+      show_usage
+      ;;
+  esac
+}
+
+# Main command dispatcher
+main() {
+  if [[ $# -eq 0 ]]; then
+    show_usage
+    exit 0
+  fi
+
+  local command=$1
+  shift
+
+  case "$command" in
+    setup)
+      if [[ $# -eq 0 ]]; then
+        show_command_help setup
+        exit 0
+      fi
+      local subcommand=$1
+      shift
+      case "$subcommand" in
+        prereqs)
+          source "$LIB_DIR/setup.sh"
+          setup_prereqs "$@"
+          ;;
+        env)
+          source "$LIB_DIR/setup.sh"
+          prepare_mac_env "$@"
+          ;;
+        *)
+          echo "Error: Unknown setup subcommand: $subcommand"
+          show_command_help setup
+          exit 1
+          ;;
+      esac
+      ;;
+    verify)
+      if [[ $# -eq 0 ]]; then
+        show_command_help verify
+        exit 0
+      fi
+      local subcommand=$1
+      shift
+      source "$LIB_DIR/verify.sh"
+      case "$subcommand" in
+        code)
+          verify_code "$@"
+          ;;
+        security)
+          verify_security "$@"
+          ;;
+        size)
+          verify_size "$@"
+          ;;
+        all)
+          verify_all "$@"
+          ;;
+        *)
+          echo "Error: Unknown verify subcommand: $subcommand"
+          show_command_help verify
+          exit 1
+          ;;
+      esac
+      ;;
+    build)
+      source "$LIB_DIR/build.sh"
+      verify_build "$@"
+      ;;
+    help)
+      if [[ $# -eq 0 ]]; then
+        show_usage
+      else
+        show_command_help "$1"
+      fi
+      ;;
+    version)
+      show_version
+      ;;
+    *)
+      echo "Error: Unknown command: $command"
+      show_usage
+      exit 1
+      ;;
+  esac
+}
+
+# Execute main function
+main "$@" 

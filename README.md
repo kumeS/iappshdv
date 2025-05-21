@@ -163,6 +163,98 @@ While currently a collection of iOS development shell scripts, the future vision
 2. Publishing as a Homebrew package
 3. Making the toolset accessible to all Mac users for easier iOS/macOS development quality assurance
 
+## Installation
+
+### Using Homebrew (Recommended)
+
+You can install iappshdv using Homebrew:
+
+```bash
+# Add the tap repository
+brew tap username/tap
+
+# Install iappshdv
+brew install username/tap/iappshdv
+```
+
+For detailed installation instructions, see [HOMEBREW.md](HOMEBREW.md).
+
+### Manual Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/username/iappshdv.git
+cd iappshdv
+```
+
+2. Add the `bin` directory to your PATH:
+```bash
+export PATH="$PATH:$(pwd)/bin"
+```
+
+3. Make the main script executable:
+```bash
+chmod +x bin/iappshdv
+```
+
+## Usage
+
+iappshdv provides a unified command-line interface for all functionality:
+
+```
+iappshdv <command> [options]
+```
+
+### Commands
+
+- `setup`: Setup development environment
+  - `prereqs`: Install prerequisite tools
+  - `env`: Prepare Mac environment for iOS development
+
+- `verify`: Run verification tools
+  - `code`: Verify code quality
+  - `security`: Perform security checks
+  - `size`: Verify IPA size
+  - `all`: Run all verification checks
+
+- `build`: Verify build
+
+- `help`: Show help message
+- `version`: Show version information
+
+### Examples
+
+1. Initial setup on a new Mac:
+```bash
+iappshdv setup prereqs
+iappshdv setup env
+```
+
+2. Verify an iOS project:
+```bash
+iappshdv verify all ~/Projects/MyiOSApp
+```
+
+3. Verify only code quality:
+```bash
+iappshdv verify code ~/Projects/MyiOSApp
+```
+
+4. Verify an iOS project including IPA size check:
+```bash
+iappshdv verify size ~/Projects/MyiOSApp ~/Downloads/MyApp.ipa 50
+```
+
+5. Verify with build checks:
+```bash
+iappshdv build ~/Projects/MyiOSApp
+```
+
+For more information on each command, use:
+```bash
+iappshdv help <command>
+```
+
 ## Requirements
 - macOS environment
 - Basic development tools (most can be installed via the included setup scripts)
@@ -170,4 +262,68 @@ While currently a collection of iOS development shell scripts, the future vision
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Development Status
+
+### Current Version
+
+**Version:** 0.1.0 (Initial Release)
+
+### Recent Updates
+
+- Implemented unified command structure with a modular approach
+- Consolidated functionality into separate library modules (common.sh, setup.sh, verify.sh, build.sh)
+- Added shell completions for bash and zsh
+- Created Homebrew Formula for easy distribution
+- Added test environment in 'apptest' directory with intentional code issues for verification testing
+
+### Roadmap
+
+#### Upcoming in v0.2.0
+- Complete implementation of verification functions in verify.sh
+- Improve error handling and reporting
+- Add more comprehensive tests
+
+#### Planned for v1.0.0
+- Full implementation of all verification tools
+- Comprehensive documentation
+- Improved integration with CI/CD workflows
+- Extended compatibility with different iOS/macOS project structures
+
+## Project Structure
+
+```
+iappshdv/
+├── bin/                # Executable commands
+│   └── iappshdv       # Main command
+├── lib/                # Library functions
+│   ├── common.sh      # Common functions
+│   ├── setup.sh       # Setup related functions
+│   ├── verify.sh      # Verification related functions
+│   └── build.sh       # Build related functions
+├── completions/        # Shell completions
+│   ├── iappshdv.bash  # Bash completion
+│   └── iappshdv.zsh   # Zsh completion
+├── Formula/            # Homebrew formula
+│   └── iappshdv.rb    # Formula definition
+└── legacy/             # Legacy and development files
+    ├── docs/           # Development documentation
+    │   ├── dev.txt        # Development guidelines (in Japanese)
+    │   └── 250521_summary.txt # Development summary
+    ├── install_prereqs.sh     # Legacy installation script
+    ├── prepare_mac_env.sh     # Legacy environment preparation script
+    ├── verify_debug_v1.sh     # Legacy verification script v1
+    ├── verify_debug_v2.sh     # Legacy verification script v2
+    └── verify_debug_wbuild_v1.sh # Legacy verification with build script
+```
+
+## Development vs. Installation
+
+When installing via Homebrew, only the necessary files for execution are installed:
+- Executable command (`bin/iappshdv`)
+- Library functions (`lib/*`)
+- Completions
+- Documentation (README.md, HOMEBREW.md)
+
+The entire `legacy/` directory is excluded from installation, keeping the installed package lightweight and focused on the current implementation.
 
