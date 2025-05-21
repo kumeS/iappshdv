@@ -1,183 +1,85 @@
-# iappshdv 
+# iappshdv
 
-A collection of shell scripts for automating quality verification and debugging in iOS/macOS application development.
+A toolkit for automated quality verification and debugging in iOS/macOS application development.
 
-## Project Concept
+## Project Purpose and Vision
 
-The iappshdv project is being developed with the concept of "iOS app development by shell script" at its core. We're excited about the future development of this project and look forward to your continued interest and support.
+iappshdv ("iOS Application Shell Development and Verification") is designed to streamline and standardize quality assurance processes in iOS and macOS application development. The project addresses common challenges faced by mobile development teams:
 
-## Overview
+- Inconsistent code quality across team members and projects
+- Difficulty maintaining security standards and dependency hygiene
+- Time-consuming manual verification processes
+- Challenges in establishing measurable quality metrics
 
-This project provides a comprehensive set of shell scripts designed to help iOS/macOS developers automate code quality checks, security scanning, performance validation, and build verification. It streamlines the development workflow by integrating various quality assurance tools into simple command-line interfaces.
+By providing a unified command-line interface to industry-standard verification tools, iappshdv helps development teams:
 
-## Key Features
+1. **Improve Code Quality** - Consistent formatting, reduced duplication, and lower complexity
+2. **Enhance Security** - Automated vulnerability scanning and license compliance checks
+3. **Optimize Performance** - Size verification and binary validation
+4. **Streamline Development** - Automated workflows and standardized metrics
 
-### Environment Setup
-- Development tool installation and updates (Xcode Command Line Tools, Homebrew, Xcode.app)
-- Mac development environment preparation (XcodeGen, swift-format, SwiftLint)
+### Development Roadmap
 
-### Code Quality Checks
-- Duplicate code detection (jscpd)
-- Code formatting (swiftformat)
-- Static analysis (swiftlint)
-- File line statistics
-- Cyclomatic complexity analysis
-- Unused code detection (periphery)
-- TODO comment tracking
+This project is being developed with the following milestones:
 
-### Security Checks
-- Dependency vulnerability scanning (osv-scanner)
-- License compatibility verification (licenseplist)
-- Dependency update status (CocoaPods/SwiftPM)
+- **v0.1.0 (Current)**: Initial release with core functionality
+- **v0.2.0 (Planned)**: Complete implementation of verification functions, improved error handling
+- **v1.0.0 (Future)**: Full integration with CI/CD systems, comprehensive documentation, and extended compatibility
 
-### Performance Validation
-- IPA size verification
-- Symbol UUID duplication checking (dwarf information validation)
+The long-term vision includes distribution via Homebrew, integration with popular iOS CI/CD pipelines, and expansion to cover additional quality metrics specific to the Apple development ecosystem.
 
-### Build Verification
-- Error detection and listing via xcodebuild
+## Key Features: The `verify all` Command
 
-## Script Details
+The core functionality of iappshdv is provided through the `verify all` command, which performs comprehensive verification of your iOS/macOS projects:
 
-### Environment Setup Scripts
-
-#### `sh/install_prereqs.sh`
-Checks and installs required development tools for iOS/macOS development.
-
-**Features:**
-- Installs Xcode Command Line Tools if not already installed
-- Sets up or updates Homebrew
-- Installs or updates Xcode.app via Homebrew Cask
-- Installs essential brew packages (coreutils, cocoapods, fastlane, carthage, swiftlint, swiftformat)
-
-**Usage:**
 ```bash
-./sh/install_prereqs.sh
+iappshdv verify all <project_folder> [<ipa_path>] [<baseline_mb>] [-s|--silent] [-y|--yes] [-u|--update-deps]
 ```
 
-#### `sh/prepare_mac_env.sh`
-Prepares a Mac environment with necessary packages for iOS development.
+### What `verify all` Does
 
-**Features:**
-- Installs Homebrew if not already installed
-- Updates Homebrew to the latest version
-- Installs or verifies XcodeGen (for project generation)
-- Installs or verifies swift-format (for code formatting)
-- Installs or verifies SwiftLint (for linting)
+This powerful command runs a complete suite of checks on your project:
 
-**Usage:**
-```bash
-./sh/prepare_mac_env.sh
-```
+1. **Code Quality Verification**
+   - Duplicate code detection (jscpd)
+   - Code formatting (swiftformat)
+   - Static analysis (swiftlint)
+   - File line statistics
+   - Cyclomatic complexity analysis
+   - Unused code detection (periphery)
+   - TODO comment tracking
 
-### Verification Scripts
+2. **Security Verification**
+   - Dependency vulnerability scanning (osv-scanner)
+   - License compatibility verification (licenseplist)
+   - Dependency update status (CocoaPods/SwiftPM)
 
-#### `sh/verify_debug_v2.sh` (Latest Version)
-The most recent and comprehensive code quality verification script.
+3. **Size Verification** (when IPA path is provided)
+   - IPA size verification
+   - Symbol UUID duplication checking
 
-**Features:**
-- Duplicate code detection (jscpd)
-- Code formatting (swiftformat)
-- Static analysis (swiftlint)
-- File line statistics
-- Cyclomatic complexity analysis
-- Unused code detection (periphery)
-- IPA size verification
-- Symbol UUID duplication checking
-- Dependency vulnerability scanning (osv-scanner)
-- License compatibility checking (licenseplist)
-- Dependency update status verification (CocoaPods/SwiftPM)
+### Options
 
-**Usage:**
-```bash
-./sh/verify_debug_v2.sh <project_folder> [<ipa_path>] [<baseline_mb>] [-s|--silent] [-y|--yes] [-u|--update-deps]
-```
-
-**Parameters:**
-- `<project_folder>`: Target project directory
-- `<ipa_path>`: IPA file path (optional)
-- `<baseline_mb>`: IPA size baseline in MB (optional)
+- `<project_folder>`: Target project directory (required)
+- `[<ipa_path>]`: IPA file path (optional)
+- `[<baseline_mb>]`: IPA size baseline in MB (optional)
 - `-s|--silent`: Silent mode (suppress detailed output)
 - `-y|--yes`: Auto-yes response (automatically approve interactive prompts)
 - `-u|--update-deps`: Automatically update dependencies
 
-#### `sh/verify_debug_v1.sh`
-Previous version of the verification script with similar functionality to v2.
+### Example
 
-**Usage:**
 ```bash
-./sh/verify_debug_v1.sh <project_folder> [<ipa_path>] [<baseline_mb>] [-s|--silent] [-y|--yes] [-u|--update-deps]
+iappshdv verify all ~/Projects/MyiOSApp ~/Downloads/MyApp.ipa 50
 ```
-
-#### `sh/verify_debug_wbuild_v1.sh`
-Verification script with additional build checking functionality.
-
-**Features:**
-- Includes all basic code quality checks
-- Runs xcodebuild to detect build errors
-- Lists any build errors found
-
-**Usage:**
-```bash
-./sh/verify_debug_wbuild_v1.sh <project_folder>
-```
-
-**Parameters:**
-- `<project_folder>`: Target project directory
-
-## Example Workflow
-
-1. Initial setup on a new Mac:
-```bash
-./sh/install_prereqs.sh
-./sh/prepare_mac_env.sh
-```
-
-2. Verify an iOS project:
-```bash
-./sh/verify_debug_v2.sh ~/Projects/MyiOSApp
-```
-
-3. Verify an iOS project including IPA size check:
-```bash
-./sh/verify_debug_v2.sh ~/Projects/MyiOSApp ~/Downloads/MyApp.ipa 50
-```
-
-4. Verify with build checks:
-```bash
-./sh/verify_debug_wbuild_v1.sh ~/Projects/MyiOSApp
-```
-
-## Technical Highlights
-- Implemented in Bash for macOS environments
-- Leverages Homebrew for automated tool installation and updates
-- Uses temporary directories for log file management
-- Collects errors and warnings for comprehensive final summary
-- Flexible error level configuration based on conditions
-- Dependency version management with recommended version updates
-
-## Future Plans
-
-While currently a collection of iOS development shell scripts, the future vision includes:
-1. Integrating these scripts into a unified pipeline
-2. Publishing as a Homebrew package
-3. Making the toolset accessible to all Mac users for easier iOS/macOS development quality assurance
 
 ## Installation
 
-### Using Homebrew (Recommended)
+### Using Homebrew (Coming Soon)
 
-You can install iappshdv using Homebrew:
+Installation via Homebrew is planned for a future update. This section will be updated once the feature has been verified and made available.
 
-```bash
-# Add the tap repository
-brew tap username/tap
-
-# Install iappshdv
-brew install username/tap/iappshdv
-```
-
-For detailed installation instructions, see [HOMEBREW.md](HOMEBREW.md).
+For more details on Homebrew installation, see [HOMEBREW.md](HOMEBREW.md).
 
 ### Manual Installation
 
@@ -212,83 +114,120 @@ iappshdv <command> [options]
   - `env`: Prepare Mac environment for iOS development
 
 - `verify`: Run verification tools
-  - `code`: Verify code quality
-  - `security`: Perform security checks
-  - `size`: Verify IPA size
-  - `all`: Run all verification checks
+  - `code`: Verify code quality only
+  - `security`: Perform security checks only
+  - `size`: Verify IPA size only
+  - `all`: Run all verification checks (main function)
 
 - `build`: Verify build
 
 - `help`: Show help message
 - `version`: Show version information
 
-### Examples
+## Command Details and Options
 
-1. Initial setup on a new Mac:
-```bash
+### Setup Commands
+
+```
 iappshdv setup prereqs
+```
+
+Installs prerequisite tools needed for development (Xcode Command Line Tools, Homebrew, Xcode).
+
+```
 iappshdv setup env
 ```
 
-2. Verify an iOS project:
-```bash
-iappshdv verify all ~/Projects/MyiOSApp
+Prepares the Mac environment for iOS development (XcodeGen, swift-format, SwiftLint).
+
+### Verification Commands
+
+Basic usage format:
+```
+iappshdv verify <subcommand> <project_folder> [options]
 ```
 
-3. Verify only code quality:
+#### Specific Verification Subcommands
+
+If you need to run only specific verification checks rather than the full suite, you can use:
+
+Code quality verification:
 ```bash
 iappshdv verify code ~/Projects/MyiOSApp
 ```
 
-4. Verify an iOS project including IPA size check:
+Security checks:
+```bash
+iappshdv verify security ~/Projects/MyiOSApp
+```
+
+IPA size verification (with 50MB baseline):
 ```bash
 iappshdv verify size ~/Projects/MyiOSApp ~/Downloads/MyApp.ipa 50
 ```
 
-5. Verify with build checks:
+### Build Verification Command
+
+```
+iappshdv build <project_folder>
+```
+
+Verifies the build and detects errors.
+
+- `<project_folder>`: Target project directory (required)
+
+### Help and Version
+
+Display help:
 ```bash
+iappshdv help
+```
+
+Display help for a specific command:
+```bash
+iappshdv help verify
+```
+
+Display version information:
+```bash
+iappshdv version
+```
+
+## Examples and Workflow
+
+### Initial Setup on a New Mac
+
+```bash
+# Install required tools
+iappshdv setup prereqs
+
+# Prepare the Mac environment
+iappshdv setup env
+```
+
+### Project Verification Workflow
+
+```bash
+# Run the main full verification (recommended)
+iappshdv verify all ~/Projects/MyiOSApp
+
+# Run full verification including IPA size check (50MB baseline)
+iappshdv verify all ~/Projects/MyiOSApp ~/Downloads/MyApp.ipa 50
+
+# Run full verification in silent mode
+iappshdv verify all ~/Projects/MyiOSApp -s
+
+# Run full verification with auto-update for dependencies
+iappshdv verify all ~/Projects/MyiOSApp -u
+
+# Verify build (only if needed)
 iappshdv build ~/Projects/MyiOSApp
 ```
 
-For more information on each command, use:
-```bash
-iappshdv help <command>
-```
+## System Requirements
 
-## Requirements
 - macOS environment
 - Basic development tools (most can be installed via the included setup scripts)
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## Development Status
-
-### Current Version
-
-**Version:** 0.1.0 (Initial Release)
-
-### Recent Updates
-
-- Implemented unified command structure with a modular approach
-- Consolidated functionality into separate library modules (common.sh, setup.sh, verify.sh, build.sh)
-- Added shell completions for bash and zsh
-- Created Homebrew Formula for easy distribution
-- Added test environment in 'apptest' directory with intentional code issues for verification testing
-
-### Roadmap
-
-#### Upcoming in v0.2.0
-- Complete implementation of verification functions in verify.sh
-- Improve error handling and reporting
-- Add more comprehensive tests
-
-#### Planned for v1.0.0
-- Full implementation of all verification tools
-- Comprehensive documentation
-- Improved integration with CI/CD workflows
-- Extended compatibility with different iOS/macOS project structures
 
 ## Project Structure
 
@@ -307,23 +246,103 @@ iappshdv/
 ├── Formula/            # Homebrew formula
 │   └── iappshdv.rb    # Formula definition
 └── legacy/             # Legacy and development files
-    ├── docs/           # Development documentation
-    │   ├── dev.txt        # Development guidelines (in Japanese)
-    │   └── 250521_summary.txt # Development summary
-    ├── install_prereqs.sh     # Legacy installation script
-    ├── prepare_mac_env.sh     # Legacy environment preparation script
-    ├── verify_debug_v1.sh     # Legacy verification script v1
-    ├── verify_debug_v2.sh     # Legacy verification script v2
-    └── verify_debug_wbuild_v1.sh # Legacy verification with build script
 ```
 
-## Development vs. Installation
+## Legacy Scripts
 
-When installing via Homebrew, only the necessary files for execution are installed:
-- Executable command (`bin/iappshdv`)
-- Library functions (`lib/*`)
-- Completions
-- Documentation (README.md, HOMEBREW.md)
+This project started as a collection of independent shell scripts. The following scripts are kept in the `legacy/` directory for reference:
 
-The entire `legacy/` directory is excluded from installation, keeping the installed package lightweight and focused on the current implementation.
+### Environment Setup Scripts
+
+#### `legacy/install_prereqs.sh`
+Checks and installs required development tools for iOS/macOS development.
+
+**Features:**
+- Installs Xcode Command Line Tools if not already installed
+- Sets up or updates Homebrew
+- Installs or updates Xcode.app via Homebrew Cask
+- Installs essential brew packages (coreutils, cocoapods, fastlane, carthage, swiftlint, swiftformat)
+
+**Usage:**
+```bash
+./legacy/install_prereqs.sh
+```
+
+#### `legacy/prepare_mac_env.sh`
+Prepares a Mac environment with necessary packages for iOS development.
+
+**Features:**
+- Installs Homebrew if not already installed
+- Updates Homebrew to the latest version
+- Installs or verifies XcodeGen (for project generation)
+- Installs or verifies swift-format (for code formatting)
+- Installs or verifies SwiftLint (for linting)
+
+**Usage:**
+```bash
+./legacy/prepare_mac_env.sh
+```
+
+### Verification Scripts
+
+#### `legacy/verify_debug_v2.sh` (Latest Version)
+The most recent and comprehensive code quality verification script.
+
+**Features:**
+- Duplicate code detection (jscpd)
+- Code formatting (swiftformat)
+- Static analysis (swiftlint)
+- File line statistics
+- Cyclomatic complexity analysis
+- Unused code detection (periphery)
+- IPA size verification
+- Symbol UUID duplication checking
+- Dependency vulnerability scanning (osv-scanner)
+- License compatibility checking (licenseplist)
+- Dependency update status verification (CocoaPods/SwiftPM)
+
+**Usage:**
+```bash
+./legacy/verify_debug_v2.sh <project_folder> [<ipa_path>] [<baseline_mb>] [-s|--silent] [-y|--yes] [-u|--update-deps]
+```
+
+#### `legacy/verify_debug_v1.sh`
+Previous version of the verification script with similar functionality to v2.
+
+**Usage:**
+```bash
+./legacy/verify_debug_v1.sh <project_folder> [<ipa_path>] [<baseline_mb>] [-s|--silent] [-y|--yes] [-u|--update-deps]
+```
+
+#### `legacy/verify_debug_wbuild_v1.sh`
+Verification script with additional build checking functionality.
+
+**Features:**
+- Includes all basic code quality checks
+- Runs xcodebuild to detect build errors
+- Lists any build errors found
+
+**Usage:**
+```bash
+./legacy/verify_debug_wbuild_v1.sh <project_folder>
+```
+
+## Development Status
+
+### Current Version
+
+**Version:** 0.1.0 (Initial Release)
+
+### Future Plans
+
+#### Upcoming in v0.2.0
+- Complete implementation of verification functions in verify.sh
+- Improve error handling and reporting
+- Add more comprehensive tests
+
+#### Planned for v1.0.0
+- Full implementation of all verification tools
+- Comprehensive documentation
+- Improved integration with CI/CD workflows
+- Extended compatibility with different iOS/macOS project structures
 

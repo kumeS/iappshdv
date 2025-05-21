@@ -16,7 +16,7 @@ verify_all() {
   local ARGS=()
   local SILENT=false
   
-  # 引数処理
+  # Process arguments
   while [[ $# -gt 0 ]]; do
     case $1 in
       -s|--silent)
@@ -24,11 +24,11 @@ verify_all() {
         shift
         ;;
       -y|--yes)
-        # その他のオプション処理
+        # Process other options
         shift
         ;;
       -u|--update-deps)
-        # その他のオプション処理
+        # Process other options
         shift
         ;;
       *)
@@ -56,7 +56,7 @@ verify_all() {
   TEMP_DIR=$(get_temp_dir "iappshdv_verify")
   log_info "Log files will be stored in: $TEMP_DIR"
   
-  # 集計用の変数
+  # Variables for tallying results
   local ERRORS=()
   local WARNINGS=()
   local jscpd_summary_message=""
@@ -70,12 +70,12 @@ verify_all() {
   local gpl_cnt=0
   local ipa_mb=0
   
-  # --- 1) コード品質検証
+  # --- 1) Code Quality Verification
   log_section "Code Quality Verification"
   
   # 1.1 Duplicate code detection
   log_info "Running jscpd duplicate code detection..."
-  # ここでは実際の実行の代わりに結果をシミュレート
+  # Simulating results instead of actual execution
   local overall_dup_clones=3
   local overall_dup_lines_percentage=2
   if [ "$overall_dup_lines_percentage" -gt 15 ]; then
@@ -97,7 +97,7 @@ verify_all() {
   
   # 1.2 Code formatting
   log_info "Running swiftformat..."
-  # 実際の実行の代わりに結果をシミュレート
+  # Simulating results instead of actual execution
   fmt_exit=0
   if [ "$fmt_exit" -eq 0 ]; then
     log_success "swiftformat completed"
@@ -108,7 +108,7 @@ verify_all() {
   
   # 1.3 Static analysis
   log_info "Running SwiftLint..."
-  # 実際の実行の代わりに結果をシミュレート
+  # Simulating results instead of actual execution
   sl_cnt=8
   if [ "$sl_cnt" -gt 50 ]; then
     log_error "SwiftLint reported ${sl_cnt} issues (threshold > 50)"
@@ -124,13 +124,13 @@ verify_all() {
   
   # 1.4 File line statistics
   log_info "Analyzing file line statistics..."
-  # 実際の実行の代わりに結果をシミュレート
+  # Simulating results instead of actual execution
   total_lines=2500
   log_info "Total Swift lines: ${total_lines}"
   
   # 1.5 Cyclomatic complexity
   log_info "Analyzing cyclomatic complexity..."
-  # 実際の実行の代わりに結果をシミュレート
+  # Simulating results instead of actual execution
   over_cnt=4
   if [ "$over_cnt" -gt 10 ]; then
     log_error "High cyclomatic complexity: ${over_cnt} functions (threshold > 10)"
@@ -146,7 +146,7 @@ verify_all() {
   
   # 1.6 Unused code detection
   log_info "Detecting unused code..."
-  # 実際の実行の代わりに結果をシミュレート
+  # Simulating results instead of actual execution
   unused_cnt=6
   if [ "$unused_cnt" -gt 20 ]; then
     log_error "High number of unused symbols: ${unused_cnt} (threshold > 20)"
@@ -163,12 +163,12 @@ verify_all() {
   # 1.7 TODO comment tracking
   track_todo_comments "$PROJECT_DIR" "$SILENT"
   
-  # --- 2) セキュリティ検証
+  # --- 2) Security Verification
   log_section "Security Verification"
   
   # 2.1 Dependency vulnerability scanning
   log_info "Scanning for vulnerabilities..."
-  # 実際の実行の代わりに結果をシミュレート
+  # Simulating results instead of actual execution
   critical_cnt=0
   high_cnt=1
   if [ "$critical_cnt" -gt 0 ] || [ "$high_cnt" -gt 3 ]; then
@@ -183,7 +183,7 @@ verify_all() {
   
   # 2.2 License compatibility verification
   log_info "Verifying license compatibility..."
-  # 実際の実行の代わりに結果をシミュレート
+  # Simulating results instead of actual execution
   gpl_cnt=0
   if [ "$gpl_cnt" -gt 0 ]; then
     log_error "GPL/Affero license detected. Check license compatibility."
@@ -194,7 +194,7 @@ verify_all() {
   
   # 2.3 Dependency update status
   log_info "Checking dependency update status..."
-  # 実際の実行の代わりに結果をシミュレート
+  # Simulating results instead of actual execution
   local pod_major=2
   local sp_major=0
   if [ "$pod_major" -gt 5 ]; then
@@ -214,14 +214,14 @@ verify_all() {
     log_info "No SwiftPM major updates"
   fi
   
-  # --- 3) IPA/サイズ検証
+  # --- 3) IPA/Size Verification
   if [ -n "$IPA_PATH" ]; then
     log_section "IPA Size Verification"
     
     # 3.1 IPA size verification
     log_info "Checking IPA size..."
     if [ -f "$IPA_PATH" ]; then
-      # 実際のサイズ計算
+      # Actual size calculation
       ipa_mb=$(du -m "$IPA_PATH" | awk '{print $1}')
       log_info "Current IPA size: ${ipa_mb}MB"
       
@@ -241,7 +241,7 @@ verify_all() {
     
     # 3.2 Symbol UUID duplication checking
     log_info "Checking for symbol UUID duplications..."
-    # 実際の実行の代わりに結果をシミュレート
+    # Simulating results instead of actual execution
     local dup_uuid=""
     if [ -n "$dup_uuid" ]; then
       log_warning "Duplicate UUIDs found: ${dup_uuid}"
@@ -251,7 +251,7 @@ verify_all() {
     fi
   fi
   
-  # --- 4) コード品質サマリー
+  # --- 4) Code Quality Summary
   log_section "Code Quality Summary"
   
   log_info "Code duplication: ${jscpd_summary_message}"
@@ -264,10 +264,10 @@ verify_all() {
   log_info "GPL/LGPL licenses: ${gpl_cnt}"
   [ -n "$IPA_PATH" ] && log_info "IPA size: ${ipa_mb}MB"
   
-  # --- 5) 最終サマリー
+  # --- 5) Final Summary
   log_section "Overall Results"
   
-  # 警告の表示
+  # Display warnings
   if [ ${#WARNINGS[@]} -gt 0 ]; then
     log_warning "Warnings:"
     for w in "${WARNINGS[@]}"; do
@@ -275,7 +275,7 @@ verify_all() {
     done
   fi
   
-  # エラーの表示
+  # Display errors
   if [ ${#ERRORS[@]} -eq 0 ]; then
     log_success "All checks passed! 🎉"
   else
@@ -294,7 +294,7 @@ verify_code() {
   local ARGS=()
   local SILENT=false
   
-  # 引数処理
+  # Process arguments
   while [[ $# -gt 0 ]]; do
     case $1 in
       -s|--silent)
@@ -302,11 +302,11 @@ verify_code() {
         shift
         ;;
       -y|--yes)
-        # その他のオプション処理
+        # Process other options
         shift
         ;;
       -u|--update-deps)
-        # その他のオプション処理
+        # Process other options
         shift
         ;;
       *)
@@ -327,7 +327,7 @@ verify_code() {
   fi
   
   if [ "$SILENT" = "true" ]; then
-    # サイレントモードの場合は最小限の出力
+    # Silent mode case, minimal output
     echo "Verifying code quality for: $PROJECT_DIR"
     
     # Create temp directory for logs if not already created
@@ -335,7 +335,7 @@ verify_code() {
       TEMP_DIR=$(get_temp_dir "iappshdv_code")
     fi
     
-    # サイレントモードでもすべての検証を実行
+    # Silent mode also runs all checks
     check_duplicate_code "$PROJECT_DIR" "$SILENT"
     check_code_formatting "$PROJECT_DIR" "$SILENT"
     run_static_analysis "$PROJECT_DIR" "$SILENT"
